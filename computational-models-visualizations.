@@ -1,0 +1,7 @@
+### Framework Workflow Architecture
+
+```mermaid
+graph TD
+    A[Input Data: SPARC / DESI] --> B[Matrix Calibration Engine]
+    B --> C[Relational Framework Processing]
+    C --> D[Validated Numerical Output]
