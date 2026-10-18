@@ -1,0 +1,80 @@
+"""
+Mizan Master Equation Simulation Engine
+Discrete Relational Framework for Computational Cosmology
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+
+def relational_scaling(k, k_global):
+    """Calculates the relational scaling factor R(K_Global / k)."""
+    if k == 0:
+        return 1.0
+    return k_global / float(k)
+
+def run_mizan_simulation(steps=50, k_global=15.0):
+    """
+    Executes the discrete relational matrix evolution loop 
+    governed by the Mizan Master Equation.
+    """
+    print("Initializing Mizan Discrete Master Equation Simulation...")
+    
+    # Core structural matrix operator (M)
+    M = np.array([[0.95, 0.05], 
+                  [0.05, 0.90]])
+    
+    # Initial state matrix (Xi_0)
+    xi_prev = np.array([[1.0, 0.0], 
+                        [0.0, 1.0]])
+    
+    trajectory = []
+    
+    for k in range(1, steps + 1):
+        # Compute relational scaling factor for step k
+        r_val = relational_scaling(k, k_global)
+        
+        # State update via discrete matrix relational projection:
+        # Xi_k = M . [ Xi_{k-1} tensor R(K_Global / k) ]
+        xi_next = (M @ xi_prev) * r_val
+        
+        # Track the Frobenius norm magnitude of the state matrix at step k
+        state_norm = np.linalg.norm(xi_next)
+        trajectory.append(state_norm)
+        
+        # Advance state pointer
+        xi_prev = xi_next
+
+    return np.array(trajectory)
+
+if __name__ == "__main__":
+    total_steps = 45
+    k_global_constant = 20.0
+    
+    # Run the simulation engine
+    norm_trajectory = run_mizan_simulation(steps=total_steps, k_global=k_global_constant)
+    
+    # Ensure output directory exists for repository assets
+    os.makedirs("assets", exist_ok=True)
+    
+    # Generate and save high-resolution output plot
+    plt.figure(figsize=(9, 5), dpi=300)
+    plt.plot(range(1, total_steps + 1), norm_trajectory, marker='o', color='#2b5c8f', linewidth=2, markersize=6)
+    plt.title("Mizan Framework: Discrete State Norm Evolution (Xi_k)", fontsize=13, fontweight='bold')
+    plt.xlabel("Discrete Step Index (k)", fontsize=11)
+    plt.ylabel("State Norm Magnitude", fontsize=11)
+    plt.grid(True, linestyle='--', alpha=0.5)
+    
+    output_filepath = "assets/mizan_simulation_output.png"
+    plt.savefig(output_filepath, bbox_inches='tight')
+    print(f"Simulation completed successfully. Output plot saved to {output_filepath}")
+
+
+numpy>=1.22.0
+matplotlib>=3.5.0
+
+
+pip install -r requirements.txt
+
+python simulation.py
+
